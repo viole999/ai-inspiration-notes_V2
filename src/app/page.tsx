@@ -62,6 +62,13 @@ export default function Home() {
     const recognitionRef = useRef<any>(null);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
+    // 💡 監聽螢幕寬度：如果在手機板初始化，預設將側邊欄關閉，避免擋住畫面
+    useEffect(() => {
+        if (typeof window !== "undefined" && window.innerWidth < 768) {
+            setIsSidebarOpen(false);
+        }
+    }, []);
+
     useEffect(() => {
         fetchNotes();
         initializeSpeechRecognition();
@@ -133,6 +140,11 @@ export default function Home() {
         if (!existingTab)
             setOpenTabs((prev) => [...prev, { ...targetTab, id: finalTabId }]);
         setActiveTabId(finalTabId);
+
+        // 💡 手機版用戶點選任何新內容（如打開筆記），自動收起側邊欄以騰出完整看讀空間
+        if (typeof window !== "undefined" && window.innerWidth < 768) {
+            setIsSidebarOpen(false);
+        }
 
         if (!isNavigatingRef.current) {
             const newHistory = tabHistory.slice(0, historyIndex + 1);
@@ -403,9 +415,18 @@ export default function Home() {
             : null;
 
     return (
+        // 💡 修正點：加上 relative 與 overflow-hidden 避免手機版發生奇怪的左右晃動滑動破版
         <div
-            className={`min-h-screen flex ${currentTheme.bg} ${currentTheme.text} antialiased transition-colors duration-300`}
+            className={`min-h-screen w-full flex ${currentTheme.bg} ${currentTheme.text} antialiased transition-colors duration-300 relative overflow-hidden`}
         >
+            {/* 💡 手機版限定遮罩層：當手機版側邊欄被打開時，背景會變黑，點擊即關閉側邊欄 */}
+            {isSidebarOpen && (
+                <div 
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="fixed inset-0 bg-black/40 z-30 md:hidden animate-fade-in transition-opacity"
+                />
+            )}
+
             {/* 導覽列 */}
             <Sidebar
                 currentTheme={currentTheme}
@@ -423,7 +444,8 @@ export default function Home() {
             />
 
             {/* 工作大區 */}
-            <div className="flex-1 flex flex-col min-w-0 relative">
+            {/* 💡 修正點：加上 h-screen flex-col overflow-hidden，確保內部 Workspace 元件可以完美計算高度而不溢出螢幕外 */}
+            <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative">
                 <Header
                     currentTheme={currentTheme}
                     isSidebarOpen={isSidebarOpen}
@@ -444,46 +466,49 @@ export default function Home() {
                     profile={profile}
                     handleSignOut={handleSignOut}
                     setIsAuthModalOpen={setIsAuthModalOpen}
-                    setIsProfileModalOpen={setIsProfileModalOpen} // 👈 3. 傳入控制狀態給 Header
+                    setIsProfileModalOpen={setIsProfileModalOpen}
                 />
 
                 {/* 依據當前分頁渲染對應的 Workspace 分頁區 */}
-                {currentTab.type === "home" && (
-                    <HomeWorkspace
-                        currentTheme={currentTheme}
-                        notes={notes}
-                        openRightTab={openRightTab}
-                    />
-                )}
+                {/* 💡 修正點：外層包覆一個 flex-1 overflow-y-auto 的容器，確保手機版內容可以流暢滾動且不破版 */}
+                <div className="flex-1 min-h-0 w-full overflow-y-auto">
+                    {currentTab.type === "home" && (
+                        <HomeWorkspace
+                            currentTheme={currentTheme}
+                            notes={notes}
+                            openRightTab={openRightTab}
+                        />
+                    )}
 
-                {currentTab.type === "note" && (
-                    <NoteWorkspace
-                        currentTheme={currentTheme}
-                        isFullWidth={isFullWidth}
-                        inputTitle={inputTitle}
-                        setInputTitle={setInputTitle}
-                        inputContent={inputContent}
-                        setInputContent={setInputContent}
-                        activeNoteData={activeNoteData}
-                        currentTab={currentTab}
-                        analyzingNoteId={analyzingNoteId}
-                    />
-                )}
+                    {currentTab.type === "note" && (
+                        <NoteWorkspace
+                            currentTheme={currentTheme}
+                            isFullWidth={isFullWidth}
+                            inputTitle={inputTitle}
+                            setInputTitle={setInputTitle}
+                            inputContent={inputContent}
+                            setInputContent={setInputContent}
+                            activeNoteData={activeNoteData}
+                            currentTab={currentTab}
+                            analyzingNoteId={analyzingNoteId}
+                        />
+                    )}
 
-                {currentTab.type === "ai" && (
-                    <AiWorkspace
-                        currentTheme={currentTheme}
-                        chatMessages={chatMessages}
-                        chatInput={chatInput}
-                        setChatInput={setChatInput}
-                        isChatLoading={isChatLoading}
-                        handleSendChatMessage={handleSendChatMessage}
-                        chatEndRef={chatEndRef}
-                    />
-                )}
+                    {currentTab.type === "ai" && (
+                        <AiWorkspace
+                            currentTheme={currentTheme}
+                            chatMessages={chatMessages}
+                            chatInput={chatInput}
+                            setChatInput={setChatInput}
+                            isChatLoading={isChatLoading}
+                            handleSendChatMessage={handleSendChatMessage}
+                            chatEndRef={chatEndRef}
+                        />
+                    )}
+                </div>
 
                 {/* 語音按鈕 */}
-                <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2">
+                <div className="fixed bottom-6 right-6 z-40 flex items-center gap-2">
                     {isListening && (
                         <span className="text-[11px] bg-red-500 text-white font-bold px-3 py-1.5 rounded-full animate-pulse shadow-md">
                             即時語音辨識中...
@@ -491,7 +516,7 @@ export default function Home() {
                     )}
                     <button
                         onClick={toggleListening}
-                        className={`w-12 h-12 rounded-full border ${currentTheme.cardBg} ${currentTheme.sidebarBorder} flex items-center justify-center shadow-md hover:scale-105`}
+                        className={`w-12 h-12 rounded-full border ${currentTheme.cardBg} ${currentTheme.sidebarBorder} flex items-center justify-center shadow-md hover:scale-105 transition-transform`}
                     >
                         {isListening ? (
                             <MicOff size={18} className="text-red-500" />
@@ -524,13 +549,12 @@ export default function Home() {
                 setIsFullWidth={setIsFullWidth}
             />
 
-            {/* 👈 4. 掛載個人資料中心彈窗 */}
             <ProfileModal
                 isOpen={isProfileModalOpen}
                 onClose={() => setIsProfileModalOpen(false)}
                 currentTheme={currentTheme}
                 profile={profile}
-                onProfileUpdate={fetchUserProfile} // 沿用原本 page.tsx 中已有的 fetchUserProfile 函式來重新整理資料
+                onProfileUpdate={fetchUserProfile}
             />
         </div>
     );

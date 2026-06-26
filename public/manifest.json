@@ -9,12 +9,12 @@
     "description": "基於 Next.js 與 Supabase 的強大筆記工作區",
     "icons": [
         {
-            "src": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=192&h=192&q=80",
+            "src": "public/icons/icon-192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=512&h=512&q=80",
+            "src": "public/icons/icon-512.png",
             "sizes": "512x512",
             "type": "image/png"
         }

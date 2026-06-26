@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
         // 定義給 Ollama 的系統提示詞，強迫其輸出特定 JSON 格式
         const systemPrompt = `你是一位高效的知識管理助手。請針對使用者的輸入內容進行分析，並嚴格只返回以下 JSON 格式，不要包含任何額外的對話、 markdown 語法（不要用 \`\`\`json）或解釋：
 {
-    "summary": "一句話精煉的摘要（繁體中文，不超過 30 字）",
+    "summary": "一句話精煉的摘要（繁體中文，不超過 200 字）",
     "tags": ["標籤1", "標籤2", "標籤3"] (最多三個與內容高度相關的繁體中文繁體標籤)
 }`;
 

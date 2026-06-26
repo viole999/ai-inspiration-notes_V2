@@ -17,3 +17,14 @@ body {
     rgb(var(--background-start-rgb));
   min-height: 100vh;
 }
+
+/* 💡 針對 Tailwind v4 Reset 機制的 Markdown 生態補強 */
+.markdown-body ul {
+  list-style-type: disc !important;
+}
+.markdown-body ol {
+  list-style-type: decimal !important;
+}
+.markdown-body table {
+  display: table !important;
+}

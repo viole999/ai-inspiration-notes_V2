@@ -209,10 +209,10 @@ export default function Header({
                 ) : (
                     <button
                         onClick={() => setIsAuthModalOpen(true)}
-                        className="border-l pl-2 md:pl-3.5 border-neutral-300/30 text-[11px] md:text-xs font-bold hover:opacity-70 flex items-center gap-1"
+                        className="border-l pl-2 md:pl-3.5 border-neutral-300/30 text-[11px] md:text-xs font-bold hover:opacity-70 flex items-center gap-1 text-neutral-700"
                     >
                         <User size={13} className="opacity-70" />
-                        <span className="hidden xs:inline">登入/註冊</span>
+                        <span>登入/註冊</span>
                     </button>
                 )}
             </div>

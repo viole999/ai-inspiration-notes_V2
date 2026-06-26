@@ -4,9 +4,9 @@
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
-    "name": "我的工作筆記 App",
-    "short_name": "工作筆記",
-    "description": "基於 Next.js 與 Supabase 的強大筆記工作區",
+    "name": "AI 靈感空間 App",
+    "short_name": "靈感空間",
+    "description": "基於 Next.js 與 Supabase 的強大 AI 靈感空間 筆記工作區",
     "icons": [
         {
             "src": "/icons/icon-192.png",
